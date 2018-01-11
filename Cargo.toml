@@ -1,0 +1,8 @@
+[package]
+name = "discord-qdb"
+version = "0.1.0"
+authors = ["marmalade <summit@tutanota.de>"]
+
+[dependencies]
+serenity = "0.4"
+yaml-rust = "0.4"
