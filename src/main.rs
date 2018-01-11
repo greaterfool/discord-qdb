@@ -1,12 +1,15 @@
 #[macro_use] extern crate serenity;
+//#[macro_use(bson, doc)]
 extern crate yaml_rust;
+extern crate bson;
+extern crate mongodb;
 
 use serenity::prelude::*;
 use serenity::model::*;
 
 use yaml_rust::{YamlLoader,YamlEmitter};
 
-use std::env;
+//use std::env;
 use std::fs::File;
 use std::io::prelude::*;
 
@@ -35,21 +38,33 @@ impl EventHandler for Handler {
 
 fn main() {
     // Read config file (YAML)
-//    println!("Reading config from file: {}", configfile);
-
     let mut config = File::open("config.yaml").expect("config.yaml not found.");
+    println!("Reading config from file: {:?}", config);
 
     let mut configcontents = String::new();
     config.read_to_string(&mut configcontents)
         .expect("Something went wrong while reading the file.");
 
     let docs = YamlLoader::load_from_str(&configcontents).unwrap();
+    let doc = &docs[0];
 
+    // Debug support
     println!("{:?}", docs);
 
+    //assert_eq!(doc["Token"].as_str().unwrap*(););
+
+    let mut out_str = String::new(); {
+        let mut emitter = YamlEmitter::new(&mut out_str);
+        emitter.dump(doc).unwrap();
+   }
+   println!("{}", out_str);
+   println!("{:?}", doc["Token"].as_str());
+
     // Configure the client with your Discord bot token in the environment.
-    let token = env::var("DISCORD_TOKEN")
-        .expect("Expected a token in the environment");
+    // let token = env::var("DISCORD_TOKEN")
+    //     .expect("Expected a token in the environment");
+    let token = doc["Token"].as_str()
+        .expect("Expected a token in config file.");
 
     // Create a new instance of the Client, logging in as a bot. This will automatically prepend your bot token with "Bot ", which is a requirement by discord for bot users.
     let mut client = Client::new(&token, Handler);
