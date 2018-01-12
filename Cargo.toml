@@ -4,7 +4,11 @@ version = "0.1.0"
 authors = ["marmalade <summit@tutanota.de>"]
 
 [dependencies]
-serenity = "0.4"
 yaml-rust = "0.4"
 bson = "0.10.0"
 mongodb = { version = "0.3.7", features = ["ssl"] }
+typemap = "0.3.3"
+
+[dependencies.serenity]
+version = "0.4"
+features = ["framework", "standard_framework"]

@@ -3,9 +3,11 @@ extern crate yaml_rust;
 #[macro_use(bson, doc)]
 extern crate bson;
 extern crate mongodb;
+extern crate typemap;
 
 use serenity::prelude::*;
 use serenity::model::*;
+use serenity::framework::standard::{Args, Command, DispatchError, StandardFramework, help_commands};
 
 use yaml_rust::{YamlLoader,YamlEmitter};
 
@@ -15,6 +17,17 @@ use mongodb::db::ThreadedDatabase;
 
 use std::fs::File;
 use std::io::prelude::*;
+use std::collections::HashMap;
+use std::env;
+use std::fmt::Write;
+use std::sync::Arc;
+use typemap::Key;
+
+struct CommandCounter;
+
+impl Key for CommandCounter {
+    type Value = HashMap<String, u64>
+}
 
 struct Handler;
 
@@ -23,6 +36,7 @@ impl EventHandler for Handler {
     //
     // Event handlers are dispatched through multi-threading, and so multiple of a single event can be dispatched simultaneously.
     fn on_message(&self, _: Context, msg: Message) {
+        // I'm gonna leave ping in here, as a debug kind of thing.
         if msg.content == ".ping" {
             if let Err(why) = msg.channel_id.say("pong") {
                 println!("Error sending message: {:?}", why);
