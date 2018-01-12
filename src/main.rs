@@ -26,7 +26,7 @@ use typemap::Key;
 struct CommandCounter;
 
 impl Key for CommandCounter {
-    type Value = HashMap<String, u64>
+    type Value = HashMap<String, u64>;
 }
 
 struct Handler;
