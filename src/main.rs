@@ -8,6 +8,7 @@ extern crate typemap;
 use serenity::prelude::*;
 use serenity::model::*;
 use serenity::framework::standard::{Args, Command, DispatchError, StandardFramework, help_commands};
+use serenity::utils;
 
 use yaml_rust::{YamlLoader,YamlEmitter};
 
@@ -34,7 +35,7 @@ struct Handler;
 impl EventHandler for Handler {
     // Set a handler for the 'on_message' event - so that whenever a new message is received - the closure (or function) passed will be called.
     //
-    // Event handlers are dispatched through multi-threading, and so multiple of a single event can be dispatched simultaneously.
+    // Event handlers are dispatched through multi-threading, and so multiple of a single event caner for Spacemacs be dispatched simultaneously.
     fn on_message(&self, _: Context, msg: Message) {
         // I'm gonna leave ping in here, as a debug kind of thing.
         if msg.content == ".ping" {

@@ -11,4 +11,4 @@ typemap = "0.3.3"
 
 [dependencies.serenity]
 version = "0.4"
-features = ["framework", "standard_framework"]
+features = ["framework", "standard_framework", "utils"]
