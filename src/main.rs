@@ -81,9 +81,9 @@ fn main() {
 
 
     //  -- MongoDB Connector --
-   // let mdb_client = mongodb::Client::connect("localhost", 27017)
-   //     .expect("Failed to initialize MongoDB standalone client.");
-   // let coll = mdb_client.db("test").collection("movies");
+   let mdb_client = mongodb::Client::connect("localhost", 27017)
+       .expect("Failed to initialize MongoDB standalone client.");
+   let coll = mdb_client.db("test").collection("quotes");
    // let mdbdoc = doc! {
    //     "title": "Jaws",
    //     "array": [1, 2, 3],
@@ -157,6 +157,8 @@ fn main() {
             .command("commands", |c| c
                      .bucket("complicated")
                      .exec(commands))
+            .command("testbed", |c| c.exec(testbed))
+            .command("addquote", |c| c.exec(addquote))
     );
 
     if let Err(why) = client.start() {
@@ -177,4 +179,17 @@ command!(commands(ctx, msg, _args){
     if let Err(why) = msg.channel_id.say(&contents) {
         println!("Error sending message: {:?}", why);
     }
+});
+
+command!(testbed(ctx, msg, _args){
+    if let Err(why) = msg.channel_id.send_message(|m| m
+                                                  .content("Friday, January 12, 2018")
+                                                  .embed(|e| e
+                                                         .title("marmalade")
+                                                         .description("*date*\n im gey"))) {
+        println!("Err sending testbed: {:?}", why);
+    }
+});
+
+command!(addquote(msg, _args){
 });
