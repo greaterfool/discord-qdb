@@ -1,4 +1,4 @@
-command!(testbed(ctx, msg, _args){
+command!(testbed(_ctx, msg, _args){
     if let Err(why) = msg.channel_id.send_message(|m| m
                                                   .content("Friday, January 12, 2018")
                                                   .embed(|e| e

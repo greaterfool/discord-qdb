@@ -1,27 +1,25 @@
 #[macro_use]
 extern crate serenity;
-extern crate yaml_rust;
 #[macro_use(bson, doc)]
 extern crate bson;
 extern crate mongodb;
 extern crate typemap;
+extern crate yaml_rust;
+
+mod yconfig;
+mod commands;
 
 use serenity::prelude::*;
 use serenity::model::*;
 use serenity::framework::standard::{Args, Command, DispatchError, StandardFramework, help_commands};
 use serenity::utils;
 
-use yaml_rust::{YamlLoader,YamlEmitter};
-
 use bson::Bson;
 use mongodb::ThreadedClient;
 use mongodb::db::ThreadedDatabase;
 
-use std::fs::File;
-use std::io::prelude::*;
 use std::collections::HashMap;
 use std::env;
-use std::fmt::Write;
 use std::sync::Arc;
 use typemap::Key;
 
@@ -34,18 +32,6 @@ impl Key for CommandCounter {
 struct Handler;
 
 impl EventHandler for Handler {
-    // Set a handler for the 'on_message' event - so that whenever a new message is received - the closure (or function) passed will be called.
-    //
-    // Event handlers are dispatched through multi-threading, and so multiple of a single event caner for Spacemacs be dispatched simultaneously.
-   // fn on_message(&self, _: Context, msg: Message) {
-   //     // I'm gonna leave ping in here, as a debug kind of thing.
-   //     if msg.content == ".ping" {
-   //         if let Err(why) = msg.channel_id.say("pong") {
-   //             println!("Error sending message: {:?}", why);
-   //         }
-   //     }
-   // }
-
     // Set a handler to be called on the 'on_ready' event. This is called when a shard is booted, and a READY payload is sent by Discord.
     // This payload contains data like the current user's guild Ids, current user data, private channels, and more.
     //
@@ -56,6 +42,9 @@ impl EventHandler for Handler {
 }
 
 fn main() {
+
+    // -- Read configuration file --
+    let config = yconfig::read_config("./configuration.yaml");
 
     //  -- MongoDB Connector --
    let mdb_client = mongodb::Client::connect("localhost", 27017)
@@ -84,7 +73,7 @@ fn main() {
    // }
 
     // Create a new instance of the Client, logging in as a bot. This will automatically prepend your bot token with "Bot ", which is a requirement by discord for bot users.
-    let mut client = serenity::Client::new(&token, Handler); {
+    let mut client = serenity::Client::new(&config.token, Handler); {
         let mut data = client.data.lock();
         data.insert::<CommandCounter>(HashMap::default());
     }
@@ -131,10 +120,11 @@ fn main() {
             .bucket("complicated", 5, 30, 2)  // Can't be used more than 2x per 30s, with a 5s delay.
             .command("about", |c| c.exec_str("Quote Database Bot utilizing serenity, and MongoDB."))
             .command("help", |c| c.exec_help(help_commands::plain))
-            .command("commands", |c| c
-                     .bucket("complicated")
-                     .exec(commands))
-            .command("testbed", |c| c.exec(testbed))
+            .command("ping", |c| c.exec(commands::meta::ping))
+            //.command("ccounter", |c| c
+            //        .bucket("complicated")
+            //        .exec(commands::meta::command_counter))
+            .command("testbed", |c| c.exec(commands::testbed::testbed))
             //.command("addquote", |c| c.exec(addquote))
     );
 
