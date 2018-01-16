@@ -56,29 +56,6 @@ impl EventHandler for Handler {
 }
 
 fn main() {
-    //  -- Read YAML Config file. --
-    let mut config = File::open("config.yaml").expect("config.yaml not found.");
-    println!("Reading config from file: {:?}", config);
-
-    let mut configcontents = String::new();
-    config.read_to_string(&mut configcontents)
-        .expect("Something went wrong while reading the file.");
-
-    let docs = YamlLoader::load_from_str(&configcontents).unwrap();
-    let doc = &docs[0];
-
-    println!("{:?}", docs); // Debug support
-
-    let mut out_str = String::new(); {
-        let mut emitter = YamlEmitter::new(&mut out_str);
-        emitter.dump(doc).unwrap();
-    }
-    println!("{}", out_str); // Debug support
-    println!("{:?}", doc["Token"].as_str()); // Debug support
-
-    let token = doc["Token"].as_str()
-        .expect("Expected a token in config file.");
-
 
     //  -- MongoDB Connector --
    let mdb_client = mongodb::Client::connect("localhost", 27017)
@@ -158,38 +135,10 @@ fn main() {
                      .bucket("complicated")
                      .exec(commands))
             .command("testbed", |c| c.exec(testbed))
-            .command("addquote", |c| c.exec(addquote))
+            //.command("addquote", |c| c.exec(addquote))
     );
 
     if let Err(why) = client.start() {
         println!("Client error: {:?}", why);
     }
 }
-
-command!(commands(ctx, msg, _args){
-    let mut contents = "Commands used:\n".to_string();
-
-    let data = ctx.data.lock();
-    let counter = data.get::<CommandCounter>().unwrap();
-
-    for (k, v) in counter {
-        let _ = write!(contents, "- {name}: {amount}\n", name=k, amount=v);
-    }
-
-    if let Err(why) = msg.channel_id.say(&contents) {
-        println!("Error sending message: {:?}", why);
-    }
-});
-
-command!(testbed(ctx, msg, _args){
-    if let Err(why) = msg.channel_id.send_message(|m| m
-                                                  .content("Friday, January 12, 2018")
-                                                  .embed(|e| e
-                                                         .title("marmalade")
-                                                         .description("*date*\n im gey"))) {
-        println!("Err sending testbed: {:?}", why);
-    }
-});
-
-command!(addquote(msg, _args){
-});

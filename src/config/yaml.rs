@@ -1,8 +1,8 @@
 /* Read configuration from YAML file */
 
 mod config
-pub fn readconfig() {
-    let mut config = File::open("config.yaml").expect("config.yaml not found.");
+pub fn readconfig(input: &str) -> String {
+    let mut config = File::open(input)expect("config.yaml not found.");
     println!("Reading config from file: {:?}", config);
 
     let mut configcontents = String::new();
